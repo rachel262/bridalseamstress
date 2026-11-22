@@ -14,7 +14,11 @@ CHECKED = 'Nov 2026'
 STATE_NAMES = {'QLD': 'Queensland', 'NSW': 'New South Wales', 'VIC': 'Victoria', 'SA': 'South Australia',
                'WA': 'Western Australia', 'ACT': 'Australian Capital Territory', 'TAS': 'Tasmania', 'NT': 'Northern Territory'}
 STATE_ORDER = ['QLD', 'NSW', 'ACT', 'VIC', 'TAS', 'SA', 'WA', 'NT']
-TAGS = ['Wedding dress alterations', 'Custom gowns', 'Bustles', 'Bridesmaids', 'Formal gowns']
+TAGS = ['Wedding dress alterations', 'Custom gowns', 'Bustles', 'Rush jobs', 'Restyling', 'Corset backs', 'Bridesmaids', 'Mother of the bride', 'Formal gowns', 'Home visits']
+# service name (sheet column X or data/enrichment.csv) -> city page filter
+SERVICE_TAGS = {'bustles': 'Bustles', 'rush jobs': 'Rush jobs', 'custom gowns': 'Custom gowns', 'restyling and redesign': 'Restyling',
+    'corset back conversion': 'Corset backs', 'bridesmaid dresses': 'Bridesmaids', 'mother of the bride': 'Mother of the bride',
+    'formal and evening wear': 'Formal gowns', 'mobile or home visits': 'Home visits'}
 
 e = lambda s: html.escape(str(s), quote=True)
 
@@ -49,9 +53,13 @@ def tags_for(r):
         out.append('Bridesmaids')
     if re.search(r'formal|ball gown|evening', t):
         out.append('Formal gowns')
+    for sv in r.get('_services', []):
+        tg = SERVICE_TAGS.get(sv.lower())
+        if tg and tg not in out:
+            out.append(tg)
     if not out:
         out.append('Wedding dress alterations')
-    return out
+    return [t for t in TAGS if t in out]
 
 
 def blurb_for(r, tags):
@@ -70,6 +78,18 @@ d = json.load(open(SRC))['values']
 h = d[0]
 rows = [dict(zip(h, r + [''] * (len(h) - len(r)))) for r in d[1:]]
 live = [r for r in rows if r['checked_bridal (Y/N)'] == 'Y' and r['business_status'] != 'CLOSED_TEMPORARILY']
+
+# website crawl results (data/enrichment.csv, keyed by place_id): services used when the sheet has none
+ENRICH = {}
+_ep = os.path.join(os.path.dirname(os.path.abspath(SRC)), 'enrichment.csv')
+if os.path.exists(_ep):
+    import csv
+    ENRICH = {x['place_id']: x for x in csv.DictReader(open(_ep, encoding='utf-8'))}
+for r in live:
+    own = [x.strip(' -•').strip() for x in re.split(r'\n|;', r.get('services', '')) if x.strip(' -•').strip()]
+    crawled = [x.strip() for x in ENRICH.get(r['place_id'], {}).get('services', '').split('\n') if x.strip()]
+    r['_own_services'] = own
+    r['_services'] = own + [x for x in crawled if x not in own]
 
 cities = collections.OrderedDict()
 for r in live:
@@ -98,7 +118,7 @@ for c in cities.values():
             'tags': tags, 'blurb': blurb_for(r, tags), 'place_id': r['place_id'], 'email': r['email'], 'serves': r.get('also_serves', '').strip(),
             'lead': r.get('lead_time', '').strip(),
             'photos': [x.strip() for x in re.split(r'[\n;,]', r.get('photos', '')) if x.strip()][:3],
-            'services': [x.strip(' -•').strip() for x in re.split(r'\n|;', r.get('services', '')) if x.strip(' -•').strip()],
+            'services': r['_own_services'] or r['_services'],
         }
         listings.append(L)
     # order: most reviewed first (no featured listings yet)
@@ -282,7 +302,7 @@ for c in cities.values():
     cards = []
     for L in c['items']:
         lp = f"{c['slug']}/{L['slug']}/"
-        tg = ''.join(f'<span class="tag">{e(t)}</span>' for t in L['tags'])
+        tg = ''.join(f'<span class="tag">{e(t)}</span>' for t in L['tags'][:4]) + (f'<span class="tag">+{len(L["tags"]) - 4} more</span>' if len(L['tags']) > 4 else '')
         cards.append(f"""<article class="card" data-tags="{e('|'.join(L['tags']))}">
 <div class="info">
 <h2><a href="{rel(1, lp)}">{e(L['name'])}</a></h2>
