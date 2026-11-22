@@ -384,9 +384,7 @@ for L in listings:
 {f'<p class="meta" style="font-size:15px;color:var(--ink2)">Also serves {e(L["serves"])}</p>' if L['serves'] else ''}
 <span class="check tag" style="align-self:flex-start;padding:6px 10px">{TICK}Bridal work checked, {CHECKED}</span>
 </div>
-<div class="photos">
-{''.join(f'<img src="{rel(2, "photos/" + p)}" alt="Bridal work by {e(L["name"])}" loading="lazy" style="width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:12px">' for p in L['photos']) if L['photos'] else '<div>Photos are added when the business claims this listing</div><div aria-hidden="true"></div><div aria-hidden="true"></div>'}
-</div>
+{('<div class="photos">' + ''.join(f'<img src="{rel(2, "photos/" + p)}" alt="Bridal work by {e(L["name"])}" loading="lazy" style="width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:12px">' for p in L['photos']) + '</div>') if L['photos'] else ''}
 <section class="blk">
 <h2>Bridal services</h2>
 <p class="meta" style="color:var(--ink2)">{e(L['blurb'])}</p>
@@ -395,7 +393,7 @@ for L in listings:
 </section>
 <section class="blk">
 <h2>How far ahead to book</h2>
-<p class="meta" style="color:var(--ink2)">{e(L['lead']) if L['lead'] else 'Not added yet. Ask when you get in touch, as busy bridal seamstresses often book out months ahead of wedding season.'}</p>
+<p class="meta" style="color:var(--ink2)">{e(L['lead']) if L['lead'] else 'Ask when you get in touch. Busy bridal seamstresses often book out months ahead of wedding season.'}</p>
 </section>
 <section style="display:flex;flex-wrap:wrap;gap:12px">{''.join(acts)}</section>
 </div>
