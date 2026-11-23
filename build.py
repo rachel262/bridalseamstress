@@ -167,7 +167,7 @@ nav.main a[aria-current]:not(.btn){text-decoration:underline;text-decoration-col
 .hero .wrap.hhero{display:grid;grid-template-columns:1fr;gap:28px;align-items:center}
 .htext{display:flex;flex-direction:column;gap:14px}
 .himg{margin:0}
-.himg img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;object-position:50% 30%;border-radius:14px}
+.himg img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;object-position:50% 8%;border-radius:14px}
 .himg figcaption{font-size:12px;color:var(--mute);margin-top:6px}
 @media(min-width:860px){.hero .wrap.hhero{grid-template-columns:1.25fr 1fr;gap:48px}.himg img{aspect-ratio:3/4;max-height:520px}}
 .crumbs{margin:0;font-size:14px;color:var(--mute)}
@@ -467,7 +467,7 @@ body = f"""<section class="hero"><div class="wrap hhero" style="padding-top:56px
 <p class="lede">On Google it is hard to tell a bridal specialist from a shop that mostly does hems and zips. Every business here has been checked by hand for wedding dress work. {total} listings across Australia so far.</p>
 <p><a class="btn btn-dark" href="#cities">Choose your city</a></p>
 </div>
-<figure class="himg"><img src="{rel(0, 'photos/hero-october-falls.jpg')}" alt="A lace wedding dress hanging in a hallway arch before the wedding" width="800" height="1200" fetchpriority="high">
+<figure class="himg"><img src="{rel(0, 'photos/hero-october-falls.jpg')}" alt="A bride in a lace gown with sheer sleeves on her wedding morning" width="1000" height="1500" fetchpriority="high">
 <figcaption>Photo: <a href="https://www.instagram.com/october_falls_photography/" target="_blank" rel="noopener">October Falls Photography</a></figcaption></figure>
 </div></section>
 <main class="wrap" style="padding-top:40px;padding-bottom:56px;display:flex;flex-direction:column;gap:24px" id="cities">
