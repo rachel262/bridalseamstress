@@ -155,6 +155,7 @@ header.top .wrap{padding-top:18px;padding-bottom:18px;display:flex;flex-wrap:wra
 .brand span{font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;font-weight:600}
 nav.main{display:flex;flex-wrap:wrap;gap:24px;align-items:center;font-size:15px}
 nav.main a{color:var(--ink);text-decoration:none}
+@media(max-width:480px){nav.main{gap:12px;font-size:14px}nav.main .btn{font-size:13px;padding:8px 12px;min-height:40px}}
 nav.main a[aria-current]:not(.btn){text-decoration:underline;text-decoration-color:var(--rose);text-decoration-thickness:2px;text-underline-offset:6px;font-weight:600}
 .btn{display:inline-block;font:inherit;font-size:15px;font-weight:500;padding:11px 18px;border-radius:999px;text-decoration:none;min-height:44px;line-height:22px;cursor:pointer}
 .btn-dark{background:var(--ink);color:#fff!important;border:1px solid var(--ink)}
@@ -214,6 +215,16 @@ section.blk h2{margin:0;font-size:20px;font-weight:600}
 .prose{max-width:720px;display:flex;flex-direction:column;gap:14px;font-size:17px;color:var(--ink2)}
 .prose h2{margin:16px 0 0;font-size:22px;color:var(--ink)}
 .prose p{margin:0}
+.prose h3{margin:8px 0 0;font-size:18px;color:var(--ink)}
+.prose ul{margin:0;padding-left:22px}
+.prose hr{border:0;border-top:1px solid var(--line);margin:12px 0}
+.blog .bimg{margin:8px 0}.blog .bimg img{display:block;width:100%;max-width:520px;height:auto;border-radius:12px}
+.blog .bimg figcaption{font-size:13px;color:var(--mute);margin-top:6px}
+.tblwrap{overflow-x:auto}.prose table{border-collapse:collapse;width:100%;font-size:15px}
+.prose th,.prose td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.prose th{color:var(--ink);font-weight:600;background:var(--soft)}
+.bgrid{display:grid;grid-template-columns:1fr;gap:20px}@media(min-width:760px){.bgrid{grid-template-columns:1fr 1fr}}
+.bcard{display:flex;flex-direction:column;gap:10px;text-decoration:none;color:var(--ink)}.bcard img{width:100%;aspect-ratio:4/3;object-fit:cover;object-position:50% 20%;border-radius:10px}
 footer.bot{border-top:1px solid var(--line);background:var(--soft)}
 footer.bot .wrap{padding-top:28px;padding-bottom:28px;display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;font-size:14px;color:var(--mute)}
 [hidden]{display:none!important}
@@ -253,7 +264,8 @@ def page(depth, path, title, desc, body, jsonld=None):
 <header class="top"><div class="wrap">
 <a class="brand" href="{r('')}">{LOGO}<span>Bridal Seamstress</span></a>
 <nav class="main" aria-label="Main">
-<a href="{r('')}#cities"{'' if path.startswith('for-seamstresses') else ' aria-current="page"'}>Find a seamstress</a>
+<a href="{r('')}#cities"{'' if path.startswith(('for-seamstresses', 'blog')) else ' aria-current="page"'}>Find a seamstress</a>
+<a href="{r('blog/')}"{' aria-current="page"' if path.startswith('blog') else ''}>Guides</a>
 <a class="btn btn-dark" href="{r('for-seamstresses/')}">For seamstresses</a>
 </nav>
 </div></header>
@@ -261,6 +273,7 @@ def page(depth, path, title, desc, body, jsonld=None):
 <footer class="bot"><div class="wrap">
 <span>Bridal Seamstress lists bridal sewing specialists across Australia. <a href="{r('for-seamstresses/')}">Add or claim a listing</a></span>
 <span><strong style="color:var(--ink)">For seamstresses:</strong> <a href="https://bridalsewingroom.pages.dev/" style="font-weight:600">Tools from The Bridal Sewing Room</a></span>
+<span><a href="{r('blog/')}">Guides for brides</a></span>
 <span>Run by <a href="https://customsewing.au">Rachel's Custom Sewing</a>, Toowoomba</span>
 </div></footer>
 </body>
@@ -511,6 +524,115 @@ body = f"""<section class="hero"><div class="wrap" style="padding-top:64px;paddi
 </div></section>"""
 open(os.path.join(OUT, '404.html'), 'w').write(page(0, '404', 'Page not found | Bridal Seamstress', 'Page not found.', body))
 
+
+# ---------- blog ----------
+BLOG_DIR = os.path.join(os.path.dirname(os.path.abspath(SRC)), 'blog')
+BLOG_PHOTOS = {  # marker file name in the draft -> (photo in data/photos, alt override or None)
+    'Paige Lamb - after hero.png': ('blog-paige-lamb-after.jpg', None),
+    'Karyn-2PointBustle.png': ('blog-karyn-2-point-bustle.jpg', None),
+    '1. Richelle Joliffe - hem close up.png': ('blog-richelle-hem-restoration.jpg', 'Wedding dress hem before and after a tulle repair and restoration clean'),
+    'Emmalee English - black gown tulle split b-a.png': ('blog-emmalee-black-gown.jpg', None),
+    '3. Grace Halligan - bustle down up.png': ('blog-grace-bustle-down-up.jpg', None),
+}
+
+
+def md_inline(t):
+    t = e(t)
+    t = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', t)
+    def lk(m):
+        url = m.group(2)
+        ext = url.startswith('http') and 'bridalseamstress.com.au' not in url
+        return f'<a href="{url}"' + (' target="_blank" rel="noopener"' if ext else '') + f'>{m.group(1)}</a>'
+    return re.sub(r'\[([^\]]+)\]\(([^)]+)\)', lk, t)
+
+
+def md_to_html(md):
+    out, para, lines = [], [], md.split('\n')
+    i = 0
+    def flush():
+        if para:
+            out.append('<p>' + md_inline(' '.join(para)) + '</p>'); para.clear()
+    while i < len(lines):
+        ln = lines[i].rstrip()
+        m = re.match(r'\[Photo:\s*(.+?)\s*\|\s*alt:\s*(.+?)\s*\|\s*caption:.*\]$', ln)
+        if m:
+            flush()
+            fn, alt = BLOG_PHOTOS.get(m.group(1), (None, None))
+            if fn:
+                out.append(f'<figure class="bimg"><img src="/photos/{fn}" alt="{e(alt or m.group(2))}" loading="lazy">'
+                           '<figcaption>Photo: <a href="https://www.rachelscustomsewing.com.au/" target="_blank" rel="noopener">Rachel\'s Custom Sewing, Toowoomba</a></figcaption></figure>')
+        elif ln.startswith('### '):
+            flush(); out.append('<h3>' + md_inline(ln[4:]) + '</h3>')
+        elif ln.startswith('## '):
+            flush(); out.append('<h2>' + md_inline(ln[3:]) + '</h2>')
+        elif ln.startswith('# '):
+            flush()
+        elif ln.startswith('|'):
+            flush(); rows = []
+            while i < len(lines) and lines[i].startswith('|'):
+                cells = [c.strip() for c in lines[i].strip().strip('|').split('|')]
+                if not all(re.fullmatch(r'-+', c) for c in cells):
+                    rows.append(cells)
+                i += 1
+            i -= 1
+            out.append('<div class="tblwrap"><table><thead><tr>' + ''.join(f'<th>{md_inline(c)}</th>' for c in rows[0]) + '</tr></thead><tbody>' +
+                       ''.join('<tr>' + ''.join(f'<td>{md_inline(c)}</td>' for c in r) + '</tr>' for r in rows[1:]) + '</tbody></table></div>')
+        elif ln.startswith('- '):
+            flush(); items = []
+            while i < len(lines) and lines[i].startswith('- '):
+                items.append('<li>' + md_inline(lines[i][2:]) + '</li>'); i += 1
+            i -= 1
+            out.append('<ul>' + ''.join(items) + '</ul>')
+        elif ln.strip() == '---':
+            flush(); out.append('<hr>')
+        elif not ln.strip():
+            flush()
+        else:
+            para.append(ln.strip())
+        i += 1
+    flush()
+    return '\n'.join(out)
+
+
+posts = []
+if os.path.isdir(BLOG_DIR):
+    for fn in sorted(os.listdir(BLOG_DIR)):
+        if not fn.endswith('.md'):
+            continue
+        raw = open(os.path.join(BLOG_DIR, fn), encoding='utf-8').read()
+        notes, content = raw.split('\n---\n', 1) if raw.startswith('---') else ('', raw)
+        content = content.lstrip('-\n')
+        title = re.search(r'^# (.+)$', content, re.M).group(1).strip()
+        seo_title = re.search(r'\*\*SEO Title\*\*[^:]*:\s*(.+)', notes).group(1).strip()
+        meta = re.search(r'\*\*Meta Description\*\*[^:]*:\s*(.+)', notes).group(1).strip()
+        slug = re.search(r'\*\*URL Slug:\*\*\s*`/?(.+?)/?`', notes).group(1).strip('/') + '/'
+        mins = (re.search(r'\*\*Reading time:\*\*\s*(.+)', notes) or [None, ''])[1].strip()
+        first_img = next((v[0] for k, v in BLOG_PHOTOS.items() if k in content), None)
+        posts.append({'title': title, 'seo': seo_title, 'meta': meta, 'path': slug, 'mins': mins, 'html': md_to_html(content), 'img': first_img})
+
+for P in posts:
+    body = f"""<main class="wrap" style="padding-top:40px;padding-bottom:64px">
+<article class="prose blog">
+<p class="crumbs"><a href="/blog/">Guides for brides</a></p>
+<h1 class="big" style="font-size:44px">{e(P['title'])}</h1>
+<p class="meta">{e(P['mins'])} read · Bridal Seamstress</p>
+{P['html']}
+</article>
+</main>"""
+    ld = {'@context': 'https://schema.org', '@type': 'Article', 'headline': P['title'], 'description': P['meta'],
+          'publisher': {'@type': 'Organization', 'name': 'Bridal Seamstress', 'url': SITE},
+          'image': SITE + '/photos/' + P['img'] if P['img'] else None, 'mainEntityOfPage': SITE + '/' + P['path']}
+    write(P['path'], page(2, P['path'], P['seo'] + ' | Bridal Seamstress', P['meta'], body, ld))
+
+if posts:
+    cards = ''.join(f"""<a class="panel bcard" href="/{P['path']}">{f'<img src="/photos/{P["img"]}" alt="" loading="lazy">' if P['img'] else ''}<h2 style="margin:0;font-size:22px">{e(P['title'])}</h2><p class="meta">{e(P['meta'])}</p></a>""" for P in posts)
+    body = f"""<section class="hero"><div class="wrap">
+<h1 class="big">Guides for brides</h1>
+<p class="lede">Straight answers about wedding dress alterations, from what they cost to when to book your first fitting.</p>
+</div></section>
+<main class="wrap" style="padding-top:40px;padding-bottom:64px"><div class="bgrid">{cards}</div></main>"""
+    write('blog/', page(1, 'blog/', 'Guides for brides | Bridal Seamstress', 'Guides for brides on wedding dress alterations in Australia: costs, timing and how to choose a bridal seamstress.', body))
+
 # ---------- assets ----------
 open(os.path.join(OUT, 'site.css'), 'w').write(CSS.strip() + '\n')
 PHOTO_SRC = os.path.join(os.path.dirname(os.path.abspath(SRC)), 'photos')
@@ -525,7 +647,7 @@ open(os.path.join(OUT, 'badge.svg'), 'w').write('''<svg xmlns="http://www.w3.org
 </svg>
 ''')
 open(os.path.join(OUT, 'robots.txt'), 'w').write(f'User-agent: *\nAllow: /\nSitemap: {SITE}/sitemap.xml\n')
-urls = [''] + ['for-seamstresses/'] + [c['slug'] + '/' for c in cities.values()] + [f"{L['city']['slug']}/{L['slug']}/" for L in listings]
+urls = [''] + ['for-seamstresses/'] + (['blog/'] + [P['path'] for P in posts] if posts else []) + [c['slug'] + '/' for c in cities.values()] + [f"{L['city']['slug']}/{L['slug']}/" for L in listings]
 open(os.path.join(OUT, 'sitemap.xml'), 'w').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
                                                  ''.join(f'<url><loc>{SITE}/{u}</loc></url>\n' for u in urls) + '</urlset>\n')
 
