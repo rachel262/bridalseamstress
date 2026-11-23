@@ -10,7 +10,7 @@ export async function onRequestPost({ request, env }) {
   const d = {
     request: LABELS[get("request")] || "Claim listing",
     business: get("business"), name: get("name"), email: get("email"), town: get("town"),
-    services: get("services"), lead_time: get("lead_time"), photos: get("photos"), listing: get("listing"),
+    services: get("services"), lead_time: get("lead_time"), photos: get("photos"), updates: get("updates") === "yes" ? "yes" : "no", listing: get("listing"),
     at: new Date().toISOString(),
   };
   if (!d.business || !d.name || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.email)) {
