@@ -280,6 +280,7 @@ def claim_form(prefill_name='', prefill_city='', listing_url='', kind='claim'):
 <label>Town or suburb<input name="town" type="text" value="{e(prefill_city)}"></label>
 <label>Bridal work you do<textarea name="services" rows="3"></textarea></label>
 <label>How far ahead brides should book<input name="lead_time" type="text" placeholder="For example, 3 to 4 months before the wedding"></label>
+<label>Photos of your bridal work (optional)<input name="photos" type="url" placeholder="Paste a Google Drive, Dropbox or Instagram link"><span style="font-size:13px;color:var(--mute);font-weight:400">Or email up to 3 photos to hello@bridalseamstress.com.au</span></label>
 <input type="hidden" name="listing" value="{e(listing_url)}">
 <label class="hp" aria-hidden="true">Leave this empty<input name="website_url" type="text" tabindex="-1" autocomplete="off"></label>
 <button class="btn btn-rose" type="submit">Send</button>
