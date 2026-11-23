@@ -163,6 +163,12 @@ nav.main a[aria-current]:not(.btn){text-decoration:underline;text-decoration-col
 .btn-blush{background:var(--blush);color:var(--ink)!important;font-weight:600}
 .hero{background:var(--blush)}
 .hero .wrap{padding-top:44px;padding-bottom:36px;display:flex;flex-direction:column;gap:14px}
+.hero .wrap.hhero{display:grid;grid-template-columns:1fr;gap:28px;align-items:center}
+.htext{display:flex;flex-direction:column;gap:14px}
+.himg{margin:0}
+.himg img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;object-position:50% 30%;border-radius:14px}
+.himg figcaption{font-size:12px;color:var(--mute);margin-top:6px}
+@media(min-width:860px){.hero .wrap.hhero{grid-template-columns:1.25fr 1fr;gap:48px}.himg img{aspect-ratio:3/4;max-height:520px}}
 .crumbs{margin:0;font-size:14px;color:var(--mute)}
 .crumbs a{color:var(--mute)}
 h1.big{margin:0;font-family:'Cormorant Garamond',Georgia,serif;font-weight:600;font-size:52px;line-height:1.05;text-wrap:balance}
@@ -442,10 +448,14 @@ for st in STATE_ORDER:
     links = ''.join(f'<li><a href="{rel(0, c["slug"] + "/")}">{e(c["name"])}</a> <span class="num" style="color:var(--mute)">({len(c["items"])})</span></li>' for c in cs)
     state_panels.append(f'<div class="panel"><h3>{e(STATE_NAMES[st])}</h3><ul style="list-style:none;padding:0">{links}</ul></div>')
 total = len(listings)
-body = f"""<section class="hero"><div class="wrap" style="padding-top:64px;padding-bottom:56px">
+body = f"""<section class="hero"><div class="wrap hhero" style="padding-top:56px;padding-bottom:56px">
+<div class="htext">
 <h1 class="big">Find a seamstress who really does bridal</h1>
 <p class="lede">On Google it is hard to tell a bridal specialist from a shop that mostly does hems and zips. Every business here has been checked by hand for wedding dress work. {total} listings across Australia so far.</p>
 <p><a class="btn btn-dark" href="#cities">Choose your city</a></p>
+</div>
+<figure class="himg"><img src="{rel(0, 'photos/hero-october-falls.jpg')}" alt="A lace wedding dress hanging in a hallway arch before the wedding" width="800" height="1200" fetchpriority="high">
+<figcaption>Photo: <a href="https://www.instagram.com/october_falls_photography/" target="_blank" rel="noopener">October Falls Photography</a></figcaption></figure>
 </div></section>
 <main class="wrap" style="padding-top:40px;padding-bottom:56px;display:flex;flex-direction:column;gap:24px" id="cities">
 <h2 class="serif" style="margin:0;font-size:34px">Browse by city</h2>
