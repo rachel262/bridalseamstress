@@ -119,10 +119,12 @@ for c in cities.values():
             'lead': r.get('lead_time', '').strip(),
             'photos': [x.strip() for x in re.split(r'[\n;,]', r.get('photos', '')) if x.strip()][:3],
             'services': r['_own_services'] or r['_services'],
+            'verified': r.get('verified', '').strip(), 'featured': bool(r.get('featured', '').strip()),
         }
         listings.append(L)
-    # order: most reviewed first (no featured listings yet)
-    c['items'] = sorted([L for L in listings if L['city'] is c], key=lambda L: -int(float(L['reviews'] or 0)))
+    # order: featured (badge on their own site), then verified by owner, then most reviewed
+    c['items'] = sorted([L for L in listings if L['city'] is c],
+                        key=lambda L: (not L['featured'], not L['verified'], -int(float(L['reviews'] or 0))))
 
 
 # ---------- links ----------
@@ -182,6 +184,8 @@ h1.big{margin:0;font-family:'Cormorant Garamond',Georgia,serif;font-weight:600;f
 .tag.grey{background:#F4F4F6;color:var(--mute)}
 .badge{align-self:flex-start;font-size:12px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:var(--rose);background:var(--blush);padding:4px 10px;border-radius:999px}
 .check{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--sage-ink)}
+.ver{display:inline-flex;gap:6px;align-items:center;font-size:13px;font-weight:600;color:var(--rose-d);background:var(--blush);border:1px solid #E6CFD5;border-radius:6px;padding:5px 10px}
+.feat{display:inline-block;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#fff;background:var(--rose);border-radius:4px;padding:3px 8px;margin-bottom:6px}
 .card .act{display:flex;flex-direction:column;gap:10px;align-items:flex-end}
 .panel{border-radius:14px;border:1px solid var(--line);padding:24px;display:flex;flex-direction:column;gap:10px}
 .panel.dark{background:var(--ink);color:#fff;border:0;gap:12px}
@@ -211,6 +215,7 @@ footer.bot .wrap{padding-top:28px;padding-bottom:28px;display:flex;flex-wrap:wra
 """
 
 LOGO = '<svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="#9C3F55" stroke-width="1.6" aria-hidden="true"><circle cx="14" cy="14" r="12"/><path d="M8 20 L20 8"/><circle cx="19" cy="9" r="1.6"/></svg>'
+VTICK = '<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.5" fill="#9C3F55"/><path d="M4.6 8.3l2.2 2.2 4.6-4.8" fill="none" stroke="#fff" stroke-width="1.8"/></svg>'
 TICK = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2F4A40" stroke-width="1.8" aria-hidden="true"><path d="M3 8.5l3 3 7-7"/></svg>'
 
 
@@ -300,20 +305,23 @@ for c in cities.values():
     path = c['slug'] + '/'
     n = len(c['items'])
     present = [t for t in TAGS if any(t in L['tags'] for L in c['items'])]
-    chips = '<button class="chip" type="button" aria-pressed="true" data-tag="">All bridal work</button>' + ''.join(
+    chips = '<button class="chip" type="button" aria-pressed="true" data-tag="">All bridal work</button>' + (
+        '<button class="chip" type="button" aria-pressed="false" data-tag="Verified">Verified by owner</button>' if any(L['verified'] for L in c['items']) else '') + ''.join(
         f'<button class="chip" type="button" aria-pressed="false" data-tag="{e(t)}">{e(t)}</button>' for t in present)
     cards = []
     for L in c['items']:
         lp = f"{c['slug']}/{L['slug']}/"
         tg = ''.join(f'<span class="tag">{e(t)}</span>' for t in L['tags'][:4]) + (f'<span class="tag">+{len(L["tags"]) - 4} more</span>' if len(L['tags']) > 4 else '')
-        cards.append(f"""<article class="card" data-tags="{e('|'.join(L['tags']))}">
+        cards.append(f"""<article class="card" data-tags="{e('|'.join(L['tags'] + (['Verified'] if L['verified'] else [])))}">
 <div class="info">
+{'<span class="feat">Featured</span>' if L['featured'] else ''}
 <h2><a href="{rel(1, lp)}">{e(L['name'])}</a></h2>
 <p class="meta">{e(L['suburb'])}{(' · also serves ' + e(L['serves'])) if L['serves'] else ''}{stars(L)}</p>
 <p class="meta" style="color:var(--ink2)">{e(L['blurb'])}</p>
 <div class="tags">{tg}</div>
 </div>
 <div class="act">
+{f'<span class="ver">{VTICK}Verified by owner</span>' if L['verified'] else ''}
 <span class="check">{TICK}Bridal work checked {CHECKED}</span>
 <a class="btn btn-line" href="{rel(1, lp)}">View profile</a>
 </div>
@@ -335,7 +343,7 @@ for c in cities.values():
 <aside class="colside">
 <div class="panel dark">
 <h3>Are you a {e(c['name'])} bridal seamstress?</h3>
-<p>Your listing is free. Claim it to add photos and tell brides how far ahead to book.</p>
+<p>Your listing is free. Claim it to get a Verified by owner tick, add photos and tell brides how far ahead to book.</p>
 <a class="btn btn-blush" style="align-self:flex-start" href="{rel(1, 'for-seamstresses/')}">Claim or add your listing</a>
 </div>
 <div class="panel">
@@ -385,7 +393,7 @@ for L in listings:
 <h1 class="big" style="font-size:46px">{e(L['name'])}</h1>
 <p class="meta" style="font-size:16px">{e(L['suburb'])}, {e(L['state'])}{stars(L)}</p>
 {f'<p class="meta" style="font-size:15px;color:var(--ink2)">Also serves {e(L["serves"])}</p>' if L['serves'] else ''}
-<span class="check tag" style="align-self:flex-start;padding:6px 10px">{TICK}Bridal work checked, {CHECKED}</span>
+<div style="display:flex;flex-wrap:wrap;gap:8px">{f'<span class="ver" title="The owner has confirmed these details">{VTICK}Verified by owner</span>' if L['verified'] else ''}<span class="check tag" style="padding:6px 10px">{TICK}Bridal work checked, {CHECKED}</span></div>
 </div>
 {('<div class="photos">' + ''.join(f'<img src="{rel(2, "photos/" + p)}" alt="Bridal work by {e(L["name"])}" loading="lazy" style="width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:12px">' for p in L['photos']) + '</div>') if L['photos'] else ''}
 <section class="blk">
@@ -402,7 +410,7 @@ for L in listings:
 </div>
 <aside class="colside panel soft" style="padding:26px;gap:14px">
 <h2 class="serif" style="margin:0;font-size:28px">Is this your business?</h2>
-<p>Claim it free to add photos and your booking lead time.</p>
+<p>Claim it free to get a Verified by owner tick, and add photos and your booking lead time.</p>
 {claim_form(L['name'], L['suburb'], SITE + '/' + path)}
 <div style="border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:6px">
 <p style="font-weight:600;font-size:14px">Want to be seen first?</p>
@@ -456,7 +464,7 @@ body = f"""<section class="hero"><div class="wrap">
 <main class="wrap cols">
 <div class="colmain prose">
 <h2>Your listing is free</h2>
-<p>If you came up in our search we have probably already listed you. Claim your listing to add photos and tell brides how far ahead to book. If you are not listed yet, use the form to ask, and we will check your bridal work before adding you.</p>
+<p>If you came up in our search we have probably already listed you. Claim your listing to get a Verified by owner tick, add photos and tell brides how far ahead to book. Verified listings show above unverified ones, and brides can filter for them. If you are not listed yet, use the form to ask, and we will check your bridal work before adding you.</p>
 <h2>Featured spot</h2>
 <p>{FEATURED_COPY} Featured listings show first on the city page with a small Featured label.</p>
 <h2>Badge for your website</h2>
