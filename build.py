@@ -153,6 +153,7 @@ header.top .wrap{padding-top:18px;padding-bottom:18px;display:flex;flex-wrap:wra
 .brand span{font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;font-weight:600}
 nav.main{display:flex;flex-wrap:wrap;gap:24px;align-items:center;font-size:15px}
 nav.main a{color:var(--ink);text-decoration:none}
+nav.main a[aria-current]:not(.btn){text-decoration:underline;text-decoration-color:var(--rose);text-decoration-thickness:2px;text-underline-offset:6px;font-weight:600}
 .btn{display:inline-block;font:inherit;font-size:15px;font-weight:500;padding:11px 18px;border-radius:999px;text-decoration:none;min-height:44px;line-height:22px;cursor:pointer}
 .btn-dark{background:var(--ink);color:#fff!important;border:1px solid var(--ink)}
 .btn-line{border:1px solid var(--ink);color:var(--ink)!important;background:#fff}
@@ -241,7 +242,7 @@ def page(depth, path, title, desc, body, jsonld=None):
 <header class="top"><div class="wrap">
 <a class="brand" href="{r('')}">{LOGO}<span>Bridal Seamstress</span></a>
 <nav class="main" aria-label="Main">
-<a href="{r('')}#cities">Find a seamstress</a>
+<a href="{r('')}#cities"{'' if path.startswith('for-seamstresses') else ' aria-current="page"'}>Find a seamstress</a>
 <a class="btn btn-dark" href="{r('for-seamstresses/')}">For seamstresses</a>
 </nav>
 </div></header>
@@ -499,7 +500,7 @@ open(os.path.join(OUT, 'badge.svg'), 'w').write('''<svg xmlns="http://www.w3.org
 <rect x="1" y="1" width="218" height="62" rx="12" fill="#F7EEF0" stroke="#9C3F55"/>
 <g fill="none" stroke="#9C3F55" stroke-width="1.6" transform="translate(14 18)"><circle cx="14" cy="14" r="12"/><path d="M8 20 L20 8"/><circle cx="19" cy="9" r="1.6"/></g>
 <text x="52" y="27" font-family="Figtree,Arial,sans-serif" font-size="11" fill="#5A5E70">Hand-checked listing on</text>
-<text x="52" y="46" font-family="Cormorant Garamond,Georgia,serif" font-size="20" font-weight="600" fill="#1E2235">Bridal Seamstress</text>
+<text x="52" y="46" font-family="Cormorant Garamond,Georgia,serif" font-size="20" font-weight="600" fill="#1E2235" textLength="154" lengthAdjust="spacingAndGlyphs">Bridal Seamstress</text>
 </svg>
 ''')
 open(os.path.join(OUT, 'robots.txt'), 'w').write(f'User-agent: *\nAllow: /\nSitemap: {SITE}/sitemap.xml\n')
