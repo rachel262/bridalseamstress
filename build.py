@@ -89,7 +89,7 @@ for r in live:
     own = [x.strip(' -•').strip() for x in re.split(r'\n|;', r.get('services', '')) if x.strip(' -•').strip()]
     crawled = [x.strip() for x in ENRICH.get(r['place_id'], {}).get('services', '').split('\n') if x.strip()]
     r['_own_services'] = own
-    r['_services'] = own + [x for x in crawled if x not in own]
+    r['_services'] = own or crawled  # the owner's own list wins over the website crawl
 
 cities = collections.OrderedDict()
 for r in live:
