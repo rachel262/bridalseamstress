@@ -409,10 +409,13 @@ for L in listings:
 <section style="display:flex;flex-wrap:wrap;gap:12px">{''.join(acts)}</section>
 </div>
 <aside class="colside panel soft" style="padding:26px;gap:14px">
-<h2 class="serif" style="margin:0;font-size:28px">Is this your business?</h2>
+{(f'''<h2 class="serif" style="margin:0;font-size:28px">Verified by owner</h2>
+<p>The owner of {e(L['name'])} has confirmed these details.</p>
+<p style="font-size:14px;color:var(--mute)">Owner and need to change something? Email <a href="mailto:hello@bridalseamstress.com.au">hello@bridalseamstress.com.au</a></p>
+''') if L['verified'] else (f'''<h2 class="serif" style="margin:0;font-size:28px">Is this your business?</h2>
 <p>Claim it free to get a Verified by owner tick, and add photos and your booking lead time.</p>
 {claim_form(L['name'], L['suburb'], SITE + '/' + path)}
-<div style="border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:6px">
+''')}<div style="border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:6px">
 <p style="font-weight:600;font-size:14px">Want to be seen first?</p>
 <p style="font-size:14px;color:var(--mute)">{FEATURED_COPY}</p>
 </div>
