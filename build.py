@@ -272,7 +272,7 @@ def page(depth, path, title, desc, body, jsonld=None):
 {body}
 <footer class="bot"><div class="wrap">
 <span>Bridal Seamstress lists bridal sewing specialists across Australia. <a href="{r('for-seamstresses/')}">Add or claim a listing</a></span>
-<span><strong style="color:var(--ink)">For seamstresses:</strong> <a href="https://bridalsewingroom.pages.dev/" style="font-weight:600">Tools from The Bridal Sewing Room</a></span>
+<span><strong style="color:var(--ink)">For seamstresses:</strong> <a href="https://thebridalsewingroom.com/" style="font-weight:600">Tools from The Bridal Sewing Room</a></span>
 <span><a href="{r('blog/')}">Guides for brides</a></span>
 <span>Run by <a href="https://customsewing.au">Rachel's Custom Sewing</a>, Toowoomba</span>
 </div></footer>
@@ -441,7 +441,7 @@ for L in listings:
 <div style="border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:6px">
 <p style="font-weight:600;font-size:14px">Tools for bridal seamstresses</p>
 <p style="font-size:14px;color:var(--mute)">Price sheets, booking guides and a free pricing calculator from The Bridal Sewing Room, made by a working bridal seamstress.</p>
-<a style="font-size:14px;font-weight:600" href="https://bridalsewingroom.pages.dev/">See the tools</a>
+<a style="font-size:14px;font-weight:600" href="https://thebridalsewingroom.com/">See the tools</a>
 </div>
 </aside>
 </main>"""
@@ -498,7 +498,7 @@ body = f"""<section class="hero"><div class="wrap">
 <p><img src="{rel(1, 'badge.svg')}" alt="Listed on Bridal Seamstress" width="220" height="64"></p>
 <h2>Tools for your business</h2>
 <p>The Bridal Sewing Room makes tools for bridal seamstresses, like price sheets, booking guides and a free pricing calculator. They come from a working bridal seamstress, so the times and methods are real.</p>
-<p><a class="btn btn-dark" href="https://bridalsewingroom.pages.dev/">See the tools</a> <a href="https://rachelscustomsewing.gumroad.com/subscribe" style="margin-left:12px">Hear when new ones come out</a></p>
+<p><a class="btn btn-dark" href="https://thebridalsewingroom.com/">See the tools</a> <a href="https://rachelscustomsewing.gumroad.com/subscribe" style="margin-left:12px">Hear when new ones come out</a></p>
 <h2>Changes or removal</h2>
 <p>If something on your listing is wrong, or you would rather not be listed, choose that option in the form and we will sort it out.</p>
 </div>
