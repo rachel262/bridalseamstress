@@ -117,7 +117,7 @@ for c in cities.values():
             'website': r['website'].strip(), 'maps': r['location_link'], 'rating': r['rating'], 'reviews': r['reviews'],
             'tags': tags, 'blurb': blurb_for(r, tags), 'place_id': r['place_id'], 'email': r['email'], 'serves': r.get('also_serves', '').strip(),
             'lead': r.get('lead_time', '').strip(),
-            'photos': [x.strip() for x in re.split(r'[\n;,]', r.get('photos', '')) if x.strip()][:3],
+            'photos': [x.strip() for x in re.split(r'[\n;,]', r.get('photos', '')) if x.strip()][:6 if r.get('featured', '').strip() else 3],
             'services': r['_own_services'] or r['_services'],
             'verified': r.get('verified', '').strip(), 'featured': bool(r.get('featured', '').strip()),
         }
@@ -313,7 +313,7 @@ def claim_form(prefill_name='', prefill_city='', listing_url='', kind='claim'):
 </form>"""
 
 
-FEATURED_COPY = 'A featured spot puts you at the top of your city page. It is free while our badge is on your website, linking to your listing.'
+FEATURED_COPY = 'A featured spot puts you at the top of your city page and shows up to 6 photos. It is free while our badge is on your website, linking to your listing.'
 
 # ---------- city pages ----------
 by_state = collections.defaultdict(list)
