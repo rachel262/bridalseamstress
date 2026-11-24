@@ -414,7 +414,7 @@ for L in listings:
 {f'<p class="meta" style="font-size:15px;color:var(--ink2)">Also serves {e(L["serves"])}</p>' if L['serves'] else ''}
 <div style="display:flex;flex-wrap:wrap;gap:8px">{f'<span class="ver" title="The owner has confirmed these details">{VTICK}Verified by owner</span>' if L['verified'] else ''}<span class="check tag" style="padding:6px 10px">{TICK}Bridal work checked, {CHECKED}</span></div>
 </div>
-{('<div class="photos">' + ''.join(f'<img src="{rel(2, "photos/" + p)}" alt="Bridal work by {e(L["name"])}" loading="lazy" style="width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:12px">' for p in L['photos']) + '</div>') if L['photos'] else ''}
+{('<div class="photos">' + ''.join(f'<img src="{rel(2, "photos/" + p)}" alt="Bridal work by {e(L["name"])}" loading="lazy" style="width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:12px">' for p in L['photos']) + '</div>' + ('<p class="meta" style="font-size:13px;margin-top:8px">Photos from their own website. Owner? Email hello@bridalseamstress.com.au to change or remove them.</p>' if any(p.startswith('web-') for p in L['photos']) else '')) if L['photos'] else ''}
 <section class="blk">
 <h2>Bridal services</h2>
 <p class="meta" style="color:var(--ink2)">{e(L['blurb'])}</p>
