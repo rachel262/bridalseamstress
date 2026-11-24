@@ -1,3 +1,5 @@
 site/public/
 __pycache__/
 outreach-list*.csv
+us/build_us.py
+us/site/public/
