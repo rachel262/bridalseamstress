@@ -1,0 +1,31 @@
+name: Build and deploy US site
+on:
+  push:
+    branches: [main]
+    paths: ['us/**', 'build.py']
+  workflow_dispatch:
+jobs:
+  deploy:
+    # off until the US domain and Pages project exist: set repo variable US_DEPLOY=true to switch on
+    if: vars.US_DEPLOY == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Make US build script from the AU build.py
+        env:
+          US_HOST: ${{ vars.US_HOST }}
+          US_GA_ID: ${{ vars.US_GA_ID }}
+        run: python3 us/patch_build.py build.py us/build_us.py
+      - name: Build site
+        run: python3 us/build_us.py us/data/master.json us/site/public
+      - name: Fill in KV id
+        run: sed -i "s/REPLACE_WITH_KV_ID/${{ secrets.CLAIMS_KV_ID }}/" us/site/wrangler.toml
+      - name: Deploy to Cloudflare Pages
+        working-directory: us/site
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx --yes wrangler@3 pages deploy --project-name bridalseamstress-us --branch main --commit-dirty=true
