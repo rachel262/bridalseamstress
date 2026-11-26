@@ -10,6 +10,8 @@ SRC, OUT = sys.argv[1], sys.argv[2]
 PREVIEW = '--preview' in sys.argv
 SITE = 'https://bridalseamstress.com.au'
 CHECKED = 'Nov 2026'
+import datetime
+TODAY = datetime.date.today().isoformat()
 
 STATE_NAMES = {'QLD': 'Queensland', 'NSW': 'New South Wales', 'VIC': 'Victoria', 'SA': 'South Australia',
                'WA': 'Western Australia', 'ACT': 'Australian Capital Territory', 'TAS': 'Tasmania', 'NT': 'Northern Territory'}
@@ -228,6 +230,9 @@ section.blk h2{margin:0;font-size:20px;font-weight:600}
 footer.bot{border-top:1px solid var(--line);background:var(--soft)}
 footer.bot .wrap{padding-top:28px;padding-bottom:28px;display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;font-size:14px;color:var(--mute)}
 [hidden]{display:none!important}
+.intro{max-width:760px;display:flex;flex-direction:column;gap:10px;margin:4px 0 14px;color:var(--ink2)}.intro p{margin:0}
+.faq{display:flex;flex-direction:column;gap:10px;margin-top:28px}.faq h2{margin:0 0 4px;font-size:30px}
+.faq details{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:#fff}.faq summary{font-weight:600;cursor:pointer}.faq details p{margin:10px 0 0;color:var(--ink2)}
 @media (max-width:600px){h1.big{font-size:38px}.card .act{align-items:flex-start}.photos{grid-template-columns:repeat(2,minmax(0,1fr))}}
 """
 
@@ -239,6 +244,8 @@ TICK = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2F4
 def page(depth, path, title, desc, body, jsonld=None):
     r = lambda p: rel(depth, p)
     canon = SITE + '/' + path
+    if isinstance(jsonld, list):
+        jsonld = {'@context': 'https://schema.org', '@graph': [{k: v for k, v in x.items() if k != '@context'} for x in jsonld]}
     ld = f'<script type="application/ld+json">{json.dumps(jsonld)}</script>' if jsonld else ''
     return f"""<!doctype html>
 <html lang="en-AU">
@@ -313,6 +320,26 @@ def claim_form(prefill_name='', prefill_city='', listing_url='', kind='claim'):
 </form>"""
 
 
+INTROS = {}
+_ip = os.path.join(os.path.dirname(os.path.abspath(SRC)), 'city_intros.json')
+if os.path.exists(_ip):
+    INTROS = {k: v for k, v in json.load(open(_ip, encoding='utf-8')).items() if not k.startswith('_')}
+COST_URL, TIME_URL = '/blog/how-much-do-wedding-dress-alterations-cost/', '/blog/how-long-do-wedding-dress-alterations-take/'
+
+
+def faq_html(qas):
+    return '<section class="faq"><h2 class="serif">Common questions</h2>' + ''.join(
+        f'<details><summary>{e(q)}</summary><p>{a}</p></details>' for q, a in qas) + '</section>'
+
+
+def faq_ld(qas):
+    return {'@type': 'FAQPage', 'mainEntity': [{'@type': 'Question', 'name': q, 'acceptedAnswer': {'@type': 'Answer', 'text': html.unescape(re.sub(r'<[^>]+>', '', a))}} for q, a in qas]}
+
+
+def crumbs_ld(items):
+    return {'@type': 'BreadcrumbList', 'itemListElement': [{'@type': 'ListItem', 'position': i + 1, 'name': n, 'item': SITE + '/' + u} for i, (n, u) in enumerate(items)]}
+
+
 FEATURED_COPY = 'A featured spot puts you at the top of your city page and shows up to 6 photos. It is free while our badge is on your website, linking to your listing.'
 
 # ---------- city pages ----------
@@ -348,16 +375,44 @@ for c in cities.values():
     nearby = [o for o in by_state[c['state']] if o is not c]
     near = ' · '.join(f'<a href="{rel(1, o["slug"] + "/")}">{e(o["name"])}</a>' for o in nearby) or f'<a href="{rel(1, "")}#cities">All cities</a>'
     word = 'business' if n == 1 else 'businesses'
+    cn = c['name']
+    intro = ''.join(f'<p>{e(x)}</p>' for x in INTROS.get(c['slug'], []))
+    nver = sum(1 for L in c['items'] if L['verified'])
+    ngown = sum(1 for L in c['items'] if 'Custom gowns' in L['tags'])
+    nbus = [L for L in c['items'] if 'Bustles' in L['tags']]
+    subs = [s for s, _ in collections.Counter(L['suburb'] for L in c['items'] if L['suburb'] != cn).most_common(4)]
+    leads = [L for L in c['items'] if L['lead']][:2]
+    qas = [(f'How many bridal seamstresses are there in {cn}?',
+            f'We list {n} {cn} {word} that do wedding dress work, each checked by hand in {CHECKED}.'
+            + (f' {nver} of them have been verified by the owner.' if nver > 1 else ' One of them has been verified by the owner.' if nver == 1 else '')
+            + (f' You will find them in {", ".join(subs[:-1])} and {subs[-1]} as well as other suburbs.' if len(subs) > 1 else ''))]
+    if ngown:
+        qas.append((f'Can I find someone in {cn} who makes wedding dresses?',
+                    f'Yes. {ngown} of the {cn} listings make gowns to order as well as, or instead of, altering them. Use the Custom gowns filter above to see them.'))
+    if nbus:
+        qas.append((f'Who adds bustles to wedding dresses in {cn}?',
+                    ('These ' + str(len(nbus)) + ' listings mention bustles: ' if len(nbus) > 1 else 'This listing mentions bustles: ') +
+                    ', '.join(f'<a href="{rel(1, c["slug"] + "/" + L["slug"] + "/")}">{e(L["name"])}</a>' for L in nbus[:6]) +
+                    ('. Most other bridal seamstresses can add one too, so it is worth asking.' if len(nbus) <= 6 else ', with more on the list above.')))
+    qas.append((f'How far ahead should I book wedding dress alterations in {cn}?',
+                'Most bridal seamstresses say your first fitting should be six to eight weeks before the wedding, and many suggest booking that appointment as soon as you have your dress.'
+                + ''.join(f' {e(L["name"])} says: {e(L["lead"].rstrip("."))}.' for L in leads)
+                + f' Our <a href="{TIME_URL}">wedding dress alterations timeline</a> has the details.'))
+    qas.append((f'How much do wedding dress alterations cost in {cn}?',
+                'It depends on the dress and how much needs to change. As a guide, a simple hem on a one layer dress is usually $60 to $150, and taking in the side seams is usually $120 to $400. '
+                f'Your seamstress will quote properly at the first fitting. See <a href="{COST_URL}">what wedding dress alterations cost</a> for a job by job list.'))
     body = f"""<section class="hero"><div class="wrap">
 <p class="crumbs"><a href="{rel(1, '')}">Australia</a> › {e(STATE_NAMES[c['state']])} › {e(c['name'])}</p>
 <h1 class="big">Bridal seamstresses in {e(c['name'])}</h1>
-<p class="lede">{n} {e(c['name'])} {word} that do wedding dress work. We check every listing by hand, so you only see people who actually do bridal sewing.</p>
+<p class="lede">{n} {e(c['name'])} {word} that do wedding dress alterations or make bridal gowns. We check every listing by hand, so you only see people who actually do bridal sewing.</p>
+{f'<div class="intro">{intro}</div>' if intro else ''}
 <div class="chips" role="group" aria-label="Filter by type of work">{chips}</div>
 </div></section>
 <main class="wrap cols">
 <div class="colmain" id="results">
 {''.join(cards)}
 <p class="meta" id="count" aria-live="polite">Showing {n} of {n}</p>
+{faq_html(qas)}
 </div>
 <aside class="colside">
 <div class="panel dark">
@@ -375,6 +430,10 @@ for c in cities.values():
 </ul>
 </div>
 <div class="panel">
+<h3>Guides for brides</h3>
+<p style="line-height:1.7"><a href="{COST_URL}">What alterations cost</a><br><a href="{TIME_URL}">When to start your fittings</a></p>
+</div>
+<div class="panel">
 <h3>Nearby</h3>
 <p style="line-height:1.7">{near}</p>
 </div>
@@ -387,11 +446,12 @@ chips.forEach(function(x){{x.setAttribute('aria-pressed',x===b?'true':'false')}}
 cards.forEach(function(c){{var ok=!t||c.getAttribute('data-tags').split('|').indexOf(t)>-1;c.hidden=!ok;if(ok)shown++}});
 count.textContent='Showing '+shown+' of '+cards.length;}})}});}})();
 </script>"""
-    ld = {'@context': 'https://schema.org', '@type': 'ItemList', 'name': f'Bridal seamstresses in {c["name"]}',
-          'itemListElement': [{'@type': 'ListItem', 'position': i + 1, 'url': f"{SITE}/{c['slug']}/{L['slug']}/", 'name': L['name']}
-                              for i, L in enumerate(c['items'])]}
-    write(path, page(1, path, f'Bridal seamstresses in {c["name"]} | Bridal Seamstress',
-                     f'{n} hand-checked bridal seamstresses and wedding dress alteration specialists in {c["name"]}, {c["state"]}.', body, ld))
+    ld = [{'@type': 'ItemList', 'name': f'Bridal seamstresses in {c["name"]}',
+           'itemListElement': [{'@type': 'ListItem', 'position': i + 1, 'url': f"{SITE}/{c['slug']}/{L['slug']}/", 'name': L['name']}
+                               for i, L in enumerate(c['items'])]},
+          faq_ld(qas), crumbs_ld([('Australia', ''), (c['name'], path)])]
+    write(path, page(1, path, f'Wedding dress alterations {c["name"]} | {n} bridal seamstress{"" if n == 1 else "es"}',
+                     f'{n} hand-checked bridal seamstresses in {c["name"]}, {c["state"]} for wedding dress alterations and custom gowns. See suburbs, services and booking lead times.', body, ld))
 
 # ---------- listing pages ----------
 for L in listings:
@@ -426,6 +486,10 @@ for L in listings:
 <p class="meta" style="color:var(--ink2)">{e(L['lead']) if L['lead'] else 'Ask when you get in touch. Busy bridal seamstresses often book out months ahead of wedding season.'}</p>
 </section>
 <section style="display:flex;flex-wrap:wrap;gap:12px">{''.join(acts)}</section>
+<section class="blk" style="border-top:1px solid var(--line);padding-top:18px">
+<h2>More bridal seamstresses in {e(c['name'])}</h2>
+<p class="meta" style="line-height:1.8">{' · '.join(f'<a href="{rel(2, c["slug"] + "/" + o["slug"] + "/")}">{e(o["name"])}</a>' for o in [o for o in c['items'] if o is not L][:8])}{' · ' if len(c['items']) > 1 else ''}<a href="{rel(2, c['slug'] + '/')}">See all {len(c['items'])} in {e(c['name'])}</a></p>
+</section>
 </div>
 <aside class="colside panel soft" style="padding:26px;gap:14px">
 {(f'''<h2 class="serif" style="margin:0;font-size:28px">Verified by owner</h2>
@@ -445,12 +509,14 @@ for L in listings:
 </div>
 </aside>
 </main>"""
-    ld = {'@context': 'https://schema.org', '@type': 'LocalBusiness', 'name': L['name'], 'url': L['website'] or None,
+    ld = {'@type': 'LocalBusiness', 'name': L['name'], 'url': L['website'] or None, '@id': SITE + '/' + path,
+          'description': L['blurb'] + ((' Services: ' + ', '.join(L['services']) + '.') if L['services'] else ''),
+          'image': [SITE + '/photos/' + p for p in L['photos']] or None, 'hasMap': L['maps'] or None,
           'telephone': L['tel'] or None, 'address': {'@type': 'PostalAddress', 'addressLocality': L['suburb'], 'addressRegion': L['state'], 'addressCountry': 'AU'},
           'areaServed': [a.strip() for a in re.sub(r'[()]', ',', L['serves']).replace(' and ', ',').split(',') if a.strip()] or None}
     write(path, page(2, path, f'{L["name"]}, {L["suburb"]} | Bridal Seamstress',
                      f'{L["name"]} in {L["suburb"]}, {L["state"]}.{(" Also serves " + L["serves"] + ".") if L["serves"] else ""} {L["blurb"]} Hand-checked for bridal work {CHECKED}.', body,
-                     {k: v for k, v in ld.items() if v}))
+                     [{k: v for k, v in ld.items() if v}, crumbs_ld([('Australia', ''), (c['name'], c['slug'] + '/'), (L['name'], path)])]))
 
 # ---------- home ----------
 state_panels = []
@@ -461,6 +527,14 @@ for st in STATE_ORDER:
     links = ''.join(f'<li><a href="{rel(0, c["slug"] + "/")}">{e(c["name"])}</a> <span class="num" style="color:var(--mute)">({len(c["items"])})</span></li>' for c in cs)
     state_panels.append(f'<div class="panel"><h3>{e(STATE_NAMES[st])}</h3><ul style="list-style:none;padding:0">{links}</ul></div>')
 total = len(listings)
+HOME_QAS = [
+    ('What is a bridal seamstress?', 'A bridal seamstress specialises in wedding dresses. They alter gowns to fit the bride, and some also make gowns from scratch. Many general alteration shops will take on a wedding dress, but a bridal specialist works with lace, beading and layered skirts every week.'),
+    ('How do you check the listings?', f'We look at each business by hand for real wedding dress work, using their own website and Google reviews. If there is no sign of bridal sewing, they are not listed. Owners can claim their listing to confirm the details, and those show a Verified by owner tick. Listings were last checked in {CHECKED}.'),
+    ('How do I find wedding dress alterations near me?', 'Pick your city in the list above, then filter by the work you need, such as bustles or custom gowns. Each listing shows the suburb, so you can choose someone close enough for three or four fittings.'),
+    ('How far ahead should I book wedding dress alterations?', f'Most bridal seamstresses want your first fitting six to eight weeks before the wedding, and suggest booking it as soon as you have your dress. Seamstresses are busiest from July to November. Read our <a href="{TIME_URL}">alterations timeline</a> for more.'),
+    ('How much do wedding dress alterations cost in Australia?', f'Most brides spend a few hundred dollars, depending on the dress. A simple one layer hem is usually $60 to $150, while a layered hem with a lace edge can be $250 to $600 or more. See <a href="{COST_URL}">what wedding dress alterations cost</a> for a full list.'),
+    ('Does it cost anything to be listed?', 'No. Listings are free for bridal seamstresses. Seamstresses who add our badge to their own website get a featured spot at the top of their city page.'),
+]
 body = f"""<section class="hero"><div class="wrap hhero" style="padding-top:56px;padding-bottom:56px">
 <div class="htext">
 <h1 class="big">Find a seamstress who really does bridal</h1>
@@ -478,9 +552,15 @@ body = f"""<section class="hero"><div class="wrap hhero" style="padding-top:56px
 <p>Listings are free. If you do wedding dress work and you are not here yet, tell us and we will check and add you.</p>
 <a class="btn btn-blush" style="align-self:flex-start" href="{rel(0, 'for-seamstresses/')}">Add or claim your listing</a>
 </div>
+{faq_html(HOME_QAS)}
 </main>"""
-write('', page(0, '', 'Bridal Seamstress | Hand-checked bridal seamstresses across Australia',
-               'Find a bridal seamstress near you. Every listing is checked by hand for wedding dress alterations and bridal sewing.', body))
+write('', page(0, '', 'Bridal Seamstress | Wedding dress alterations near you, hand-checked',
+               f'Find a bridal seamstress near you for wedding dress alterations. {total} listings across Australia, each checked by hand for bridal work.', body,
+               [{'@type': 'WebSite', 'name': 'Bridal Seamstress', 'url': SITE + '/', 'inLanguage': 'en-AU'},
+                {'@type': 'Organization', 'name': 'Bridal Seamstress', 'url': SITE + '/', 'logo': SITE + '/favicon.svg', 'email': 'hello@bridalseamstress.com.au',
+                 'description': 'A national directory of bridal seamstresses in Australia. Every listing is checked by hand for wedding dress work.',
+                 'parentOrganization': {'@type': 'Organization', 'name': "Rachel's Custom Sewing", 'url': 'https://customsewing.au'}},
+                faq_ld(HOME_QAS)]))
 
 # ---------- for seamstresses ----------
 body = f"""<section class="hero"><div class="wrap">
@@ -649,7 +729,14 @@ open(os.path.join(OUT, 'badge.svg'), 'w').write('''<svg xmlns="http://www.w3.org
 open(os.path.join(OUT, 'robots.txt'), 'w').write(f'User-agent: *\nAllow: /\nSitemap: {SITE}/sitemap.xml\n')
 urls = [''] + ['for-seamstresses/'] + (['blog/'] + [P['path'] for P in posts] if posts else []) + [c['slug'] + '/' for c in cities.values()] + [f"{L['city']['slug']}/{L['slug']}/" for L in listings]
 open(os.path.join(OUT, 'sitemap.xml'), 'w').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
-                                                 ''.join(f'<url><loc>{SITE}/{u}</loc></url>\n' for u in urls) + '</urlset>\n')
+                                                 ''.join(f'<url><loc>{SITE}/{u}</loc><lastmod>{TODAY}</lastmod></url>\n' for u in urls) + '</urlset>\n')
+llms = ['# Bridal Seamstress', '',
+        f'> A national directory of bridal seamstresses in Australia: {total} businesses that do wedding dress alterations or make bridal gowns, each checked by hand for bridal work (last checked {CHECKED}). Free to use, run by Rachel\'s Custom Sewing in Toowoomba, QLD.', '',
+        'Each city page lists hand-checked bridal seamstresses with suburb, services such as bustles or custom gowns, owner-verified status and booking lead times where known. Each listing page has contact details and services.', '',
+        '## Guides for brides', ''] + [f'- [{P["title"]}]({SITE}/{P["path"]}): {P["meta"]}' for P in posts] + ['', '## Bridal seamstresses by city', ''] + [
+        f'- [Bridal seamstresses in {c["name"]}, {STATE_NAMES[c["state"]]}]({SITE}/{c["slug"]}/): {len(c["items"])} listings' for st in STATE_ORDER for c in sorted(by_state.get(st, []), key=lambda c: -len(c['items']))] + [
+        '', '## For seamstresses', '', f'- [Claim or add a free listing]({SITE}/for-seamstresses/)', '- [The Bridal Sewing Room](https://thebridalsewingroom.com/): pricing and business tools for bridal seamstresses', '']
+open(os.path.join(OUT, 'llms.txt'), 'w').write('\n'.join(llms))
 
 # outreach merge list (not published): one row per listing with an email
 with open(os.path.join(os.path.dirname(OUT.rstrip('/')), 'outreach-list.csv'), 'w') as f:
