@@ -753,12 +753,16 @@ if posts:
 if CARE:
     def care_item(it):
         btn = ''
-        if it.get('link'):
+        if it.get('link') and it.get('own'):
+            btn = f'<a class="btn btn-rose btn-sm" href="{e(it["link"])}" target="_blank" rel="noopener">{e(it.get("buy_text") or "Buy from Bridal Seamstress")}</a>'
+        elif it.get('link'):
             btn = f'<a class="btn btn-rose btn-sm" href="{e(it["link"])}" target="_blank" rel="sponsored nofollow noopener">See it on {e(it.get("retailer") or "the shop")}</a>'
         img = f'<img src="{e(it["img"])}" alt="" loading="lazy" style="width:100%;max-width:220px;border-radius:10px">' if it.get('img') else ''
         look = f'<p class="meta"><strong>Look for:</strong> {e(it["look_for"])}</p>' if it.get('look_for') else ''
+        if it.get('own') and it.get('link'):
+            look = f'<p class="meta"><strong>{e(it.get("price") or "")}</strong>{" posted in Australia. " if it.get("price") else ""}This one is our own bag, sold by Bridal Seamstress.</p>'
         return f'<div class="panel">{img}<h3>{e(it["name"])}</h3><p>{e(it["why"])}</p>{look}{btn}</div>'
-    live = [it for sec in CARE['sections'] for it in sec['items'] if it.get('link')]
+    live = [it for sec in CARE['sections'] for it in sec['items'] if it.get('link') and not it.get('own')]
     amazon = any('amazon' in (it.get('retailer') or '').lower() for it in live)
     secs = ''.join(f"""<section class="blk" style="margin-top:28px"><h2 class="serif" style="font-size:30px">{e(sec['title'])}</h2>
 <p style="margin:0;color:var(--ink2);max-width:720px">{e(sec['intro'])}</p>

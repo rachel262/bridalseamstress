@@ -1,37 +1,101 @@
 {
-  "_how_to_use": "Paste each affiliate link into 'link'. Items with an empty link still show on the page, just without a button. 'retailer' is the shop name on the button (See it on Amazon). 'search' is a note for Rachel on what to pick, it is not shown on the site.",
+  "_how_to_use": "Paste each affiliate link into 'link'. Items with an empty link still show on the page, just without a button. 'retailer' is the shop name on the button (See it on Amazon). 'search' is a note for Rachel on what to pick, it is not shown on the site. Items with 'own': true are Rachel's own products: the button says buy_text with no sponsored tag, and the price line only shows once the link is filled.",
   "sections": [
     {
       "title": "For your fittings",
       "intro": "What you wear underneath changes the fit, so sort these out before your first fitting.",
       "items": [
-        {"name": "A low-back or strapless bra", "why": "Wear the bra you'll wear on the day to every fitting. If your dress has a low back, a stick-on backless bra or cups your seamstress sews into the dress are the usual fixes. Ask her which one suits your dress before you buy.", "look_for": "a plunge or low-back style in a shade close to your skin", "retailer": "Amazon", "link": "", "search": "stick on backless bra / plunge strapless bra, good reviews, AU sizing"},
-        {"name": "Shapewear, if you plan to wear it", "why": "Shapewear changes your measurements. If you wear it to one fitting and not the next, your seamstress ends up taking the dress in twice. Decide early and bring it every time.", "look_for": "a seamless style that sits below the dress neckline and back", "retailer": "Amazon", "link": "", "search": "seamless bridal shapewear thigh slimmer, nude"}
+        {
+          "name": "A low-back or strapless bra",
+          "why": "Wear the bra you'll wear on the day to every fitting. If your dress has a low back, a stick-on backless bra or cups your seamstress sews into the dress are the usual fixes. Ask her which one suits your dress before you buy.",
+          "look_for": "a plunge or low-back style in a shade close to your skin",
+          "retailer": "Amazon",
+          "link": "",
+          "search": "stick on backless bra / plunge strapless bra, good reviews, AU sizing"
+        },
+        {
+          "name": "Shapewear, if you plan to wear it",
+          "why": "Shapewear changes your measurements. If you wear it to one fitting and not the next, your seamstress ends up taking the dress in twice. Decide early and bring it every time.",
+          "look_for": "a seamless style that sits below the dress neckline and back",
+          "retailer": "Amazon",
+          "link": "",
+          "search": "seamless bridal shapewear thigh slimmer, nude"
+        }
       ]
     },
     {
       "title": "Getting it home and keeping it safe",
       "intro": "Once your dress is ready, it might hang in a wardrobe for a week or more. These keep it clean and stop it stretching.",
       "items": [
-        {"name": "A long breathable garment bag", "why": "Plastic traps moisture and can yellow white fabric. A cotton or non-woven bag lets the dress breathe. Pick one at least 180cm long so the train isn't folded up at the bottom.", "look_for": "a gusseted bag with a wide base for full skirts", "retailer": "Amazon", "link": "", "search": "breathable wedding dress garment bag 180cm gusseted"},
-        {"name": "A padded hanger", "why": "A heavy gown on a wire hanger can pull at the shoulders. Hang the dress by the loops sewn inside the waist, with a padded hanger taking a little weight at the top.", "look_for": "a wide padded or velvet hanger with no metal edges", "retailer": "Amazon", "link": "", "search": "padded satin hangers wide shoulder"}
+        {
+          "name": "A wide gusset dress bag",
+          "own": true,
+          "price": "A$29",
+          "buy_text": "Buy the bag",
+          "link": "",
+          "why": "Most garment bags are cut for a suit, so a full skirt gets squashed flat at the bottom. This white non-woven bag has a deep gusset at the base, so the skirt and train sit inside without crushing. The fabric breathes, so it won't trap moisture like plastic. It zips closed, with a hanger hole at the top and a holder for your slip. Use it to bring your dress home from the final fitting and keep it clean in the wardrobe until the morning. Posted from Toowoomba.",
+          "look_for": "a gusseted bag with a wide base for full skirts"
+        },
+        {
+          "name": "A padded hanger",
+          "why": "A heavy gown on a wire hanger can pull at the shoulders. Hang the dress by the loops sewn inside the waist, with a padded hanger taking a little weight at the top.",
+          "look_for": "a wide padded or velvet hanger with no metal edges",
+          "retailer": "Amazon",
+          "link": "",
+          "search": "padded satin hangers wide shoulder"
+        }
       ]
     },
     {
       "title": "On the morning",
       "intro": "Small things that save a panic on the day. Hand them to a bridesmaid to look after.",
       "items": [
-        {"name": "A small handheld steamer", "why": "Your seamstress will usually steam or press the dress before you collect it. A handheld steamer is for the creases from the drive home or a night in the bag. Hold it a hand's width from the fabric and try it on the inside of the hem first. Leave beading and sequins alone.", "look_for": "a compact steamer that heats up fast and doesn't spit water", "retailer": "Amazon", "link": "", "search": "handheld garment steamer compact (Philips / Russell Hobbs), no spitting"},
-        {"name": "Fashion tape and safety pins", "why": "Double-sided fashion tape holds a strap or neckline that wants to slip. A few small gold or silver safety pins fix a popped bustle hook until your bridesmaid can find a needle.", "look_for": "clear tape strips and small pins in a little tin", "retailer": "Amazon", "link": "", "search": "double sided fashion body tape + small safety pins"},
-        {"name": "Heel protectors for a garden ceremony", "why": "Stilettos sink into grass. When a heel sinks you tip forward and can step on your own hem. Clear heel stoppers slip on and are hard to spot in photos.", "look_for": "clear stoppers that match your heel size", "retailer": "Amazon", "link": "", "search": "clear heel stoppers grass wedding"}
+        {
+          "name": "A small handheld steamer",
+          "why": "Your seamstress will usually steam or press the dress before you collect it. A handheld steamer is for the creases from the drive home or a night in the bag. Hold it a hand's width from the fabric and try it on the inside of the hem first. Leave beading and sequins alone.",
+          "look_for": "a compact steamer that heats up fast and doesn't spit water",
+          "retailer": "Amazon",
+          "link": "",
+          "search": "handheld garment steamer compact (Philips / Russell Hobbs), no spitting"
+        },
+        {
+          "name": "Fashion tape and safety pins",
+          "why": "Double-sided fashion tape holds a strap or neckline that wants to slip. A few small gold or silver safety pins fix a popped bustle hook until your bridesmaid can find a needle.",
+          "look_for": "clear tape strips and small pins in a little tin",
+          "retailer": "Amazon",
+          "link": "",
+          "search": "double sided fashion body tape + small safety pins"
+        },
+        {
+          "name": "Heel protectors for a garden ceremony",
+          "why": "Stilettos sink into grass. When a heel sinks you tip forward and can step on your own hem. Clear heel stoppers slip on and are hard to spot in photos.",
+          "look_for": "clear stoppers that match your heel size",
+          "retailer": "Amazon",
+          "link": "",
+          "search": "clear heel stoppers grass wedding"
+        }
       ]
     },
     {
       "title": "After the wedding",
       "intro": "Sugar and sweat marks can turn brown over time, even ones you can't see yet. Get the dress cleaned by a specialist first, then pack it away.",
       "items": [
-        {"name": "An acid-free preservation box", "why": "Store the clean dress folded in an acid-free box, somewhere dark and dry. A cupboard inside the house is better than the garage or under the bed.", "look_for": "a box sold as acid-free and lignin-free, big enough not to crush the skirt", "retailer": "Amazon", "link": "", "search": "wedding dress preservation box acid free kit"},
-        {"name": "Acid-free tissue paper", "why": "Pad every fold with acid-free tissue so the fabric doesn't crease hard along one line. Take the dress out every year or two and refold it a different way.", "look_for": "white unbuffered acid-free tissue", "retailer": "Amazon", "link": "", "search": "acid free tissue paper unbuffered white archival"}
+        {
+          "name": "An acid-free preservation box",
+          "why": "Store the clean dress folded in an acid-free box, somewhere dark and dry. A cupboard inside the house is better than the garage or under the bed.",
+          "look_for": "a box sold as acid-free and lignin-free, big enough not to crush the skirt",
+          "retailer": "Amazon",
+          "link": "",
+          "search": "wedding dress preservation box acid free kit"
+        },
+        {
+          "name": "Acid-free tissue paper",
+          "why": "Pad every fold with acid-free tissue so the fabric doesn't crease hard along one line. Take the dress out every year or two and refold it a different way.",
+          "look_for": "white unbuffered acid-free tissue",
+          "retailer": "Amazon",
+          "link": "",
+          "search": "acid free tissue paper unbuffered white archival"
+        }
       ]
     }
   ]
