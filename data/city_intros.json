@@ -1,0 +1,83 @@
+{
+  "_note": "Local intro copy for each city page, keyed by city slug. Two short paragraphs each. Edit freely: build.py reads this file. Rules: no em dashes, no groups of three, never RCS prices.",
+  "brisbane": [
+    "Brisbane's bridal seamstresses are spread right across the city, so you don't have to head into the CBD to find a good one. There are studios in the inner north around Newstead and Fortitude Valley, and plenty more out in the suburbs at places like Carindale and Chermside.",
+    "Most Brisbane couples marry in autumn or spring to dodge the summer storms, which means local seamstresses start filling their diaries from about July. If your wedding is between September and November, get in touch as soon as you have your dress."
+  ],
+  "melbourne": [
+    "Melbourne has more bridal seamstresses than any other city in this directory. Many of them are couture studios that make gowns as well as alter them, especially in the city and South Melbourne. You'll also find quieter suburban workrooms out east in places like Vermont South and Camberwell.",
+    "Melbourne weather can turn on the day, so plenty of brides here ask about adding sleeves or a matching wrap for warmth. Bring it up at your first fitting, because it adds time to the job."
+  ],
+  "sydney": [
+    "Sydney's list leans towards the inner west and the lower north shore, with studios around Leichhardt, Petersham, Mosman and Chatswood as well as a group in the city itself. If you live further out, check the suburb on each listing before you book. A long drive for every fitting adds up quickly.",
+    "Sydney seamstresses book out early for spring weddings. Start asking around once your dress is ordered, even if your first fitting won't be until six to eight weeks before the day."
+  ],
+  "perth": [
+    "Perth's bridal seamstresses are clustered in the western suburbs around Subiaco and Claremont, with others spread from Joondalup down to Fremantle. A good number of them make gowns to order as well as altering them.",
+    "Perth's long dry summers mean a lot of outdoor ceremonies on grass and sand. If your dress has a train, ask about a bustle early. It's one of the most requested jobs here and it's much easier to plan than to rush."
+  ],
+  "adelaide": [
+    "Adelaide's list is centred on the city and the eastern suburbs, and Norwood has more bridal studios than anywhere else in South Australia. A few seamstresses work further out too, from Smithfield in the north down to McLaren Vale.",
+    "Adelaide is compact, which makes it easier to fit several fittings around work. Book your first one about six to eight weeks out, and earlier for a spring wedding when local diaries fill fast."
+  ],
+  "gold-coast": [
+    "Gold Coast seamstresses are spread along the coast from Southport down to Burleigh Heads, with more in the northern growth suburbs around Coomera and Maudsland. Destination weddings are big here, and many local seamstresses are used to brides flying in for a short fitting window.",
+    "If you're marrying on the coast but live somewhere else, tell your seamstress that at the start. Ask whether they can plan the work so you only need to travel up for the key fittings."
+  ],
+  "canberra": [
+    "Canberra's bridal seamstresses are spread between the town centres, from Gungahlin in the north down to the inner south. We also show a few seamstresses from regional New South Wales on this page until their areas have pages of their own.",
+    "Autumn is a favourite time to marry in Canberra, so seamstresses here are often busy from late summer as well as through spring. If your date is in March or April, start looking as soon as you have the dress."
+  ],
+  "central-coast": [
+    "The Central Coast has bridal seamstresses dotted from Ettalong Beach up to Norah Head, with Gosford and Erina in between. Most work on their own or in small studios, so their diaries fill quickly in the lead up to spring.",
+    "If you live on the Coast but bought your dress in Sydney, a local seamstress saves you the trip down the M1 for every fitting. Bring the shop's alteration notes along to your first appointment if they gave you any."
+  ],
+  "newcastle": [
+    "Newcastle's bridal seamstresses are mostly in the suburbs rather than the city centre, from Adamstown and Kotara across to Mayfield. There is also one out at Morpeth, which is handy if you're marrying in the Hunter.",
+    "Hunter Valley weddings bring a lot of brides through Newcastle, so local seamstresses get busy in spring and again in autumn. Book as soon as you have your dress, even if the first fitting is months away."
+  ],
+  "sunshine-coast": [
+    "Maroochydore has most of the Sunshine Coast's bridal seamstresses. The rest are spread from Caloundra up to Tewantin, with a couple in the hinterland at Montville and Yandina.",
+    "Hinterland and beach venues are both popular here, and seamstresses on the Coast are used to brides who need a dress that copes with grass or sand. A bustle or a slightly shorter hem can make a big difference on uneven ground."
+  ],
+  "geelong": [
+    "Geelong's bridal seamstresses work in the city and in Newtown. We also show a few Melbourne studios that Geelong and Surf Coast brides often travel to for fittings.",
+    "If you're getting married on the Surf Coast or the Bellarine Peninsula, ask your seamstress about wind. A long train or a loose veil is much easier to manage with a plan for the day."
+  ],
+  "hobart": [
+    "Hobart only has a handful of bridal seamstresses, on both sides of the Derwent. With so few to choose from, it pays to book early.",
+    "Tasmanian weddings lean towards summer and early autumn, when the weather is most settled. Local diaries start filling in spring, so get in touch once your dress is ordered."
+  ],
+  "launceston": [
+    "Launceston has only one listing so far. If you're in northern Tasmania and know a bridal seamstress we've missed, please tell us and we'll check them and add them.",
+    "Some brides in the north travel down to Hobart for fittings, so it's worth looking at the Hobart page too."
+  ],
+  "darwin": [
+    "Darwin's bridal seamstresses are spread from the city out to Casuarina and Winnellie. Most Top End weddings happen in the dry season, roughly May to September, so that's when local seamstresses are busiest.",
+    "The heat matters here. Ask your seamstress about lighter linings or taking out a layer of tulle so you stay comfortable through the ceremony and the photos."
+  ],
+  "cairns": [
+    "Cairns seamstresses are mostly in the city and up around Smithfield. Far North Queensland is a big destination wedding spot, so many of them work with brides who arrive only a week or two before the day.",
+    "If that's you, contact a seamstress well before you travel. Ask what they need from you ahead of time, and book your fitting dates before you lock in flights."
+  ],
+  "townsville": [
+    "Townsville has a few bridal seamstresses, in the city and the nearby suburbs. There aren't many to choose from, so it's worth calling around early.",
+    "The dry season from about May to October is the most popular time to marry in North Queensland. If your date falls then, book your first fitting as soon as you have the dress."
+  ],
+  "toowoomba": [
+    "Toowoomba has a small number of bridal specialists, and brides come in from across the Darling Downs to see them. If you live out of town, ask about fitting times that save you an extra trip up the range.",
+    "September is a busy month here, with the Carnival of Flowers and the start of spring garden weddings. Get in touch by winter if your wedding is in spring."
+  ],
+  "wollongong": [
+    "Wollongong's bridal seamstresses are in the city and the northern suburbs around Fairy Meadow, with one further south at Windang. Two of them are bridal shops that do their alterations in house.",
+    "A lot of Illawarra couples marry on the coast, where a train can catch on sand or blow about. If your dress has one, ask about a bustle at your first fitting."
+  ],
+  "ballarat": [
+    "Ballarat only has a couple of listings so far, both in Ballarat East, and one of them makes gowns to order. If you know a local bridal seamstress we've missed, let us know.",
+    "Ballarat winters are cold. If you're marrying between May and August, ask about sleeves or a matching wrap early, because they take extra time to make."
+  ],
+  "bendigo": [
+    "Bendigo has two listings so far, in the city and nearby California Gully. If you can't find someone who suits you, Ballarat and Melbourne seamstresses are close enough for a few fittings.",
+    "Central Victorian weddings are often outdoors at wineries and gardens. Mention your venue at your first fitting so your seamstress can suggest the right hem length."
+  ]
+}
