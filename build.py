@@ -5,6 +5,7 @@ Usage: python3 build.py master.json out_dir [--preview]
 --preview writes links ending in index.html so the pages work as plain files.
 """
 import json, re, sys, os, html, unicodedata, collections, shutil
+from urllib.parse import urlencode
 
 SRC, OUT = sys.argv[1], sys.argv[2]
 PREVIEW = '--preview' in sys.argv
@@ -230,6 +231,7 @@ section.blk h2{margin:0;font-size:20px;font-weight:600}
 footer.bot{border-top:1px solid var(--line);background:var(--soft)}
 footer.bot .wrap{padding-top:28px;padding-bottom:28px;display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;font-size:14px;color:var(--mute)}
 [hidden]{display:none!important}
+.owner{border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:8px;font-size:14px;color:var(--mute)}.owner p{margin:0}.btn-sm{align-self:flex-start;font-size:14px;padding:8px 14px;min-height:0}
 .intro{max-width:760px;display:flex;flex-direction:column;gap:10px;margin:4px 0 14px;color:var(--ink2)}.intro p{margin:0}
 .faq{display:flex;flex-direction:column;gap:10px;margin-top:28px}.faq h2{margin:0 0 4px;font-size:30px}
 .faq details{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:#fff}.faq summary{font-weight:600;cursor:pointer}.faq details p{margin:10px 0 0;color:var(--ink2)}
@@ -491,21 +493,22 @@ for L in listings:
 <p class="meta" style="line-height:1.8">{' · '.join(f'<a href="{rel(2, c["slug"] + "/" + o["slug"] + "/")}">{e(o["name"])}</a>' for o in [o for o in c['items'] if o is not L][:8])}{' · ' if len(c['items']) > 1 else ''}<a href="{rel(2, c['slug'] + '/')}">See all {len(c['items'])} in {e(c['name'])}</a></p>
 </section>
 </div>
-<aside class="colside panel soft" style="padding:26px;gap:14px">
-{(f'''<h2 class="serif" style="margin:0;font-size:28px">Verified by owner</h2>
-<p>The owner of {e(L['name'])} has confirmed these details.</p>
-<p style="font-size:14px;color:var(--mute)">Owner and need to change something? Email <a href="mailto:hello@bridalseamstress.com.au">hello@bridalseamstress.com.au</a></p>
-''') if L['verified'] else (f'''<h2 class="serif" style="margin:0;font-size:28px">Is this your business?</h2>
-<p>Claim it free to get a Verified by owner tick, and add photos and your booking lead time.</p>
-{claim_form(L['name'], L['suburb'], SITE + '/' + path)}
-''')}<div style="border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:6px">
-<p style="font-weight:600;font-size:14px">Want to be seen first?</p>
-<p style="font-size:14px;color:var(--mute)">{FEATURED_COPY}</p>
+<aside class="colside" style="gap:16px">
+<div class="panel">
+<h3>Questions to ask before you book</h3>
+<ul>
+<li>How many fittings will my dress need?</li>
+<li>Do you quote before you start, or after the first fitting?</li>
+<li>How close to my date is too late to start?</li>
+</ul>
 </div>
-<div style="border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:6px">
-<p style="font-weight:600;font-size:14px">Tools for bridal seamstresses</p>
-<p style="font-size:14px;color:var(--mute)">Price sheets, booking guides and a free pricing calculator from The Bridal Sewing Room, made by a working bridal seamstress.</p>
-<a style="font-size:14px;font-weight:600" href="https://thebridalsewingroom.com/">See the tools</a>
+<div class="panel">
+<h3>Guides for brides</h3>
+<p style="line-height:1.7"><a href="{COST_URL}">What alterations cost</a><br><a href="{TIME_URL}">When to start your fittings</a></p>
+</div>
+<div class="owner">
+{(f'''<p><strong>Verified by owner.</strong> The owner of {e(L['name'])} has confirmed these details. Need a change? Email <a href="mailto:hello@bridalseamstress.com.au">hello@bridalseamstress.com.au</a></p>''') if L['verified'] else (f'''<p>Own this business?</p>
+<a class="btn btn-line btn-sm" href="{rel(2, 'claim/')}?{e(urlencode({'n': L['name'], 't': L['suburb'], 'l': path}))}" rel="nofollow">Claim this business</a>''')}
 </div>
 </aside>
 </main>"""
@@ -589,6 +592,32 @@ body = f"""<section class="hero"><div class="wrap">
 </main>"""
 write('for-seamstresses/', page(1, 'for-seamstresses/', 'For bridal seamstresses | Bridal Seamstress',
                                 'Claim or add your free listing on Bridal Seamstress, the hand-checked directory of bridal seamstresses in Australia.', body))
+
+# ---------- claim page (linked from each unverified listing) ----------
+body = f"""<main class="wrap cols" style="padding-top:36px;padding-bottom:56px">
+<div class="colmain prose">
+<p class="crumbs"><a id="back" href="{rel(1, '')}">Back to the directory</a></p>
+<h1 class="big" style="font-size:44px">Claim <span id="biz">your listing</span></h1>
+<p>Your listing is free. Claim it to get a Verified by owner tick, add photos and tell brides how far ahead to book. Verified listings show above unverified ones, and brides can filter for them.</p>
+<h2>Want to be seen first?</h2>
+<p>{FEATURED_COPY}</p>
+<h2>Tools for bridal seamstresses</h2>
+<p>Price sheets, booking guides and a free pricing calculator from <a href="https://thebridalsewingroom.com/">The Bridal Sewing Room</a>, made by a working bridal seamstress.</p>
+</div>
+<aside class="colside panel soft" style="padding:26px;gap:14px">
+<h2 class="serif" style="margin:0;font-size:28px">Claim your free listing</h2>
+{claim_form()}
+</aside>
+</main>
+<script>
+(function(){{var q=new URLSearchParams(location.search),n=q.get('n'),t=q.get('t'),l=q.get('l');
+if(!l||!/^[a-z0-9-]+\\/[a-z0-9-]+\\/$/.test(l))return;
+var f=document.querySelector('form.claim');
+if(n){{f.business.value=n;document.getElementById('biz').textContent=n;}}
+if(t)f.town.value=t;
+f.listing.value='{SITE}/'+l;document.getElementById('back').href='/'+l;document.getElementById('back').textContent='Back to the listing';}})();
+</script>"""
+write('claim/', page(1, 'claim/', 'Claim your listing | Bridal Seamstress', 'Claim your free listing on Bridal Seamstress.', body).replace('<meta name="viewport"', '<meta name="robots" content="noindex">\n<meta name="viewport"', 1))
 
 # ---------- thanks + 404 ----------
 body = f"""<section class="hero"><div class="wrap" style="padding-top:64px;padding-bottom:64px">
