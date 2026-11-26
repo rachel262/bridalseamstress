@@ -104,7 +104,7 @@ If you're short on time, tell the seamstress your wedding date when you first en
 
 **Decide on changes early.** Adding sleeves or changing the neckline after the fit is done can mean redoing work.
 
-**Pick up on time.** Collect your dress at least a week before the wedding, then hang it somewhere cool and out of the sun.
+**Pick up on time.** Collect your dress at least a week before the wedding, then hang it somewhere cool and out of the sun. A breathable garment bag keeps it clean while it waits. Our list of [wedding dress care essentials](/wedding-dress-care/) covers what's worth buying.
 
 ## How much will it cost?
 

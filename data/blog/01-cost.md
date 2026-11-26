@@ -104,7 +104,7 @@ A photo doesn't show how the lace is attached or how many layers are hiding unde
 
 Get in touch with a seamstress as soon as you've ordered or bought your dress. Good bridal seamstresses book up, especially in their busy season from July to November, and many will pre-book your fittings months ahead.
 
-Book a first fitting six to eight weeks before your wedding, or earlier if your dress needs big changes. Bring the shoes and the underwear you'll wear on the day. Ask the seamstress to talk you through each job and what it costs, so you can decide what matters most to you.
+Book a first fitting six to eight weeks before your wedding, or earlier if your dress needs big changes. Bring the shoes and the underwear you'll wear on the day. Not sure which bra works with a low back? See our [dress care essentials](/wedding-dress-care/). Ask the seamstress to talk you through each job and what it costs, so you can decide what matters most to you.
 
 ## Find a bridal seamstress near you
 

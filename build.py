@@ -25,6 +25,11 @@ SERVICE_TAGS = {'bustles': 'Bustles', 'rush jobs': 'Rush jobs', 'custom gowns': 
 
 e = lambda s: html.escape(str(s), quote=True)
 
+# bride shopping page (affiliate links); skipped when the data file is missing, e.g. the US build
+CARE_FILE = os.path.join(os.path.dirname(os.path.abspath(SRC)), 'care_picks.json')
+CARE = json.load(open(CARE_FILE, encoding='utf-8')) if os.path.exists(CARE_FILE) else None
+CARE_PATH = 'wedding-dress-care/'
+
 
 def slugify(s):
     s = unicodedata.normalize('NFKD', s).encode('ascii', 'ignore').decode()
@@ -273,7 +278,7 @@ def page(depth, path, title, desc, body, jsonld=None):
 <header class="top"><div class="wrap">
 <a class="brand" href="{r('')}">{LOGO}<span>Bridal Seamstress</span></a>
 <nav class="main" aria-label="Main">
-<a href="{r('')}#cities"{'' if path.startswith(('for-seamstresses', 'blog')) else ' aria-current="page"'}>Find a seamstress</a>
+<a href="{r('')}#cities"{'' if path.startswith(('for-seamstresses', 'blog', 'wedding-dress-care')) else ' aria-current="page"'}>Find a seamstress</a>
 <a href="{r('blog/')}"{' aria-current="page"' if path.startswith('blog') else ''}>Guides</a>
 <a class="btn btn-dark" href="{r('for-seamstresses/')}">For seamstresses</a>
 </nav>
@@ -283,6 +288,7 @@ def page(depth, path, title, desc, body, jsonld=None):
 <span>Bridal Seamstress lists bridal sewing specialists across Australia. <a href="{r('for-seamstresses/')}">Add or claim a listing</a></span>
 <span><strong style="color:var(--ink)">For seamstresses:</strong> <a href="https://thebridalsewingroom.com/" style="font-weight:600">Tools from The Bridal Sewing Room</a></span>
 <span><a href="{r('blog/')}">Guides for brides</a></span>
+{f'<span><a href="{r(CARE_PATH)}">Dress care essentials</a></span>' if CARE else ''}
 <span>Run by <a href="https://customsewing.au">Rachel's Custom Sewing</a>, Toowoomba</span>
 </div></footer>
 </body>
@@ -739,8 +745,43 @@ if posts:
 <h1 class="big">Guides for brides</h1>
 <p class="lede">Straight answers about wedding dress alterations, from what they cost to when to book your first fitting.</p>
 </div></section>
-<main class="wrap" style="padding-top:40px;padding-bottom:64px"><div class="bgrid">{cards}</div></main>"""
+<main class="wrap" style="padding-top:40px;padding-bottom:64px"><div class="bgrid">{cards}</div>
+{f'<a class="panel" href="/{CARE_PATH}" style="margin-top:24px;text-decoration:none;color:var(--ink);background:var(--blush);border:0"><h3>Wedding dress care essentials</h3><p class="meta">What to buy for your dress, from the right bra for fittings to a box for storing it afterwards.</p></a>' if CARE else ''}</main>"""
     write('blog/', page(1, 'blog/', 'Guides for brides | Bridal Seamstress', 'Guides for brides on wedding dress alterations in Australia: costs, timing and how to choose a bridal seamstress.', body))
+
+# ---------- dress care essentials (affiliate picks) ----------
+if CARE:
+    def care_item(it):
+        btn = ''
+        if it.get('link'):
+            btn = f'<a class="btn btn-rose btn-sm" href="{e(it["link"])}" target="_blank" rel="sponsored nofollow noopener">See it on {e(it.get("retailer") or "the shop")}</a>'
+        img = f'<img src="{e(it["img"])}" alt="" loading="lazy" style="width:100%;max-width:220px;border-radius:10px">' if it.get('img') else ''
+        look = f'<p class="meta"><strong>Look for:</strong> {e(it["look_for"])}</p>' if it.get('look_for') else ''
+        return f'<div class="panel">{img}<h3>{e(it["name"])}</h3><p>{e(it["why"])}</p>{look}{btn}</div>'
+    live = [it for sec in CARE['sections'] for it in sec['items'] if it.get('link')]
+    amazon = any('amazon' in (it.get('retailer') or '').lower() for it in live)
+    secs = ''.join(f"""<section class="blk" style="margin-top:28px"><h2 class="serif" style="font-size:30px">{e(sec['title'])}</h2>
+<p style="margin:0;color:var(--ink2);max-width:720px">{e(sec['intro'])}</p>
+<div class="statelist" style="margin-top:6px">{''.join(care_item(it) for it in sec['items'])}</div></section>""" for sec in CARE['sections'])
+    disclose = ('Some links on this page are affiliate links. If you buy through one, Bridal Seamstress may earn a small commission. '
+                'It costs you nothing extra, and no brand pays to be on this list.' + (' As an Amazon Associate we earn from qualifying purchases.' if amazon else ''))
+    body = f"""<section class="hero"><div class="wrap">
+<p class="crumbs"><a href="{rel(1, 'blog/')}">Guides for brides</a></p>
+<h1 class="big">Wedding dress care essentials</h1>
+<p class="lede">The handful of things worth buying for your dress, from the first fitting until you pack it away. Picked by a bridal seamstress who sees what goes wrong.</p>
+<p class="meta" style="max-width:720px">{e(disclose)}</p>
+</div></section>
+<main class="wrap" style="padding-top:12px;padding-bottom:64px">
+{secs}
+<section class="panel dark" style="margin-top:40px">
+<h3>Still need alterations?</h3>
+<p>Every seamstress in our directory has been checked to make sure they do bridal work. Read <a href="{rel(1, COST_URL.strip('/') + '/')}" style="color:#fff">what alterations cost</a> or <a href="{rel(1, TIME_URL.strip('/') + '/')}" style="color:#fff">how long they take</a>, then find someone near you.</p>
+<a class="btn btn-blush" style="align-self:flex-start" href="{rel(1, '')}#cities">Find a bridal seamstress</a>
+</section>
+</main>"""
+    write(CARE_PATH, page(1, CARE_PATH, 'Wedding dress care essentials: what to buy for your dress | Bridal Seamstress',
+                          'What to buy for your wedding dress, from the right bra for fittings to a garment bag, steamer and preservation box. Chosen by a bridal seamstress.', body,
+                          crumbs_ld([('Guides for brides', 'blog/'), ('Wedding dress care essentials', CARE_PATH)])))
 
 # ---------- assets ----------
 open(os.path.join(OUT, 'site.css'), 'w').write(CSS.strip() + '\n')
@@ -756,13 +797,13 @@ open(os.path.join(OUT, 'badge.svg'), 'w').write('''<svg xmlns="http://www.w3.org
 </svg>
 ''')
 open(os.path.join(OUT, 'robots.txt'), 'w').write(f'User-agent: *\nAllow: /\nSitemap: {SITE}/sitemap.xml\n')
-urls = [''] + ['for-seamstresses/'] + (['blog/'] + [P['path'] for P in posts] if posts else []) + [c['slug'] + '/' for c in cities.values()] + [f"{L['city']['slug']}/{L['slug']}/" for L in listings]
+urls = [''] + ['for-seamstresses/'] + (['blog/'] + [P['path'] for P in posts] if posts else []) + ([CARE_PATH] if CARE else []) + [c['slug'] + '/' for c in cities.values()] + [f"{L['city']['slug']}/{L['slug']}/" for L in listings]
 open(os.path.join(OUT, 'sitemap.xml'), 'w').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
                                                  ''.join(f'<url><loc>{SITE}/{u}</loc><lastmod>{TODAY}</lastmod></url>\n' for u in urls) + '</urlset>\n')
 llms = ['# Bridal Seamstress', '',
         f'> A national directory of bridal seamstresses in Australia: {total} businesses that do wedding dress alterations or make bridal gowns, each checked by hand for bridal work (last checked {CHECKED}). Free to use, run by Rachel\'s Custom Sewing in Toowoomba, QLD.', '',
         'Each city page lists hand-checked bridal seamstresses with suburb, services such as bustles or custom gowns, owner-verified status and booking lead times where known. Each listing page has contact details and services.', '',
-        '## Guides for brides', ''] + [f'- [{P["title"]}]({SITE}/{P["path"]}): {P["meta"]}' for P in posts] + ['', '## Bridal seamstresses by city', ''] + [
+        '## Guides for brides', ''] + [f'- [{P["title"]}]({SITE}/{P["path"]}): {P["meta"]}' for P in posts] + ([f'- [Wedding dress care essentials]({SITE}/{CARE_PATH}): what to buy for your dress, from fittings to storage'] if CARE else []) + ['', '## Bridal seamstresses by city', ''] + [
         f'- [Bridal seamstresses in {c["name"]}, {STATE_NAMES[c["state"]]}]({SITE}/{c["slug"]}/): {len(c["items"])} listings' for st in STATE_ORDER for c in sorted(by_state.get(st, []), key=lambda c: -len(c['items']))] + [
         '', '## For seamstresses', '', f'- [Claim or add a free listing]({SITE}/for-seamstresses/)', '- [The Bridal Sewing Room](https://thebridalsewingroom.com/): pricing and business tools for bridal seamstresses', '']
 open(os.path.join(OUT, 'llms.txt'), 'w').write('\n'.join(llms))
